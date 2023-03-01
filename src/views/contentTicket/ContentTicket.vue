@@ -11,93 +11,150 @@
       </a-row>
     </div>
     <div class="form-ticket-content">
-      <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-form-item label="Loại ticket" required>
-          <a-select v-model:value="modelRef.region" placeholder="--Chọn thông tin lỗi --">
-            <a-select-option value="shanghai">Zone one</a-select-option>
-            <a-select-option value="beijing">Zone two</a-select-option>
+      <a-form :label-col="labelCol" :wrapper-col="wrapperCol" :rules="rulesRef" :model="modelRef">
+        <a-form-item label="Loại ticket" v-bind="validateInfos.loaiTicket" >
+          <a-select v-model:value="modelRef.loaiTicket" placeholder="--Chọn thông tin loại --">
+            <a-select-option value="BaoLoi">Báo lỗi</a-select-option>
+            <a-select-option value="DeXuat">Đề xuất</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="Tên ticket" required>
-          <a-input v-model:value="modelRef.name" />
+
+        <a-form-item label="Hạng mục" v-bind="validateInfos.hangMuc">
+          <a-select v-model:value="modelRef.hangMuc" mode="tags" placeholder="--Chọn hạng mục --">
+            <a-select-option value="Woodslang">Woodslang</a-select-option>
+            <a-select-option value="CongTrinh">Công trình</a-select-option>
+          </a-select>
         </a-form-item>
-        <a-form-item label="Chi tiết" required>
-          <a-textarea v-model:value="modelRef.chit" />
+
+        <a-form-item label="Phòng ban" v-bind="validateInfos.phongBan">
+          <a-select v-model:value="modelRef.phongBan" placeholder="--Chọn tên phòng ban --" mode="tags">
+            <a-select-option value="PhongSoHoa">Phòng số hóa</a-select-option>
+            <a-select-option value="PhongKeToan">Phòng kế toán</a-select-option>
+          </a-select>
         </a-form-item>
-        <a-form-item class="error-infos button-uers-tickter" v-bind="errorInfos">
+
+        <a-form-item label="Độ quan trọng" v-bind="validateInfos.quanTrong">
+          <a-select v-model:value="modelRef.quanTrong" placeholder="--Chọn mức quan trọng --">
+            <a-select-option value="QT">Quan Trọng</a-select-option>
+            <a-select-option value="TB">Trung Bình</a-select-option>
+            <a-select-option value="KQT">Thấp</a-select-option>
+          </a-select>
+        </a-form-item>
+
+
+        <a-form-item label="Tên ticket" v-bind="validateInfos.tenTicket">
+          <a-input v-model:value="modelRef.tenTicket" />
+        </a-form-item>
+        <a-form-item label="Chi tiết" v-bind="validateInfos.chiTiet">
+          <a-textarea class="textarea-node" v-model:value="modelRef.chiTiet" />
+        </a-form-item>
+
+        <a-form-item name="upload" label="Ảnh hoành thành file đính kèm" >
+      <a-upload
+      v-model="modelRef.upload"
+        name="upload"
+        
+        action=""
+        accept=".png,.jpg,.svg,.docx,.pdf,.xlsx,.JPG,.JPEG,.GIF,.MP4,.AVI,.MKV,.WMV,.VOB,.FLV,.DIvX"
+      >
+        <a-button>
+          <template #icon><UploadOutlined /></template>
+          Click to upload
+        </a-button>
+      </a-upload>
+    </a-form-item>
+        
+        <a-form-item class=" button-uers-tickter">
           <a-button class="button-uers-tickter-color">Hủy</a-button>
           <!-- <a-button class="button-uers-tickter-color" style="margin-left: 10px"  @click="resetFields">Reset</a-button> -->
-          <a-button class="button-uers-tickter-color color-button-ticker" style="margin-left: 10px"
-            @click.prevent="onSubmit">Gửi</a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-upload :file-list="fileList" :remove="handleRemove" :before-upload="beforeUpload">
-      <a-button>
-        <upload-outlined></upload-outlined>
-        Select File
-      </a-button>
-    </a-upload>
-    <a-button
-      type="primary"
-      :disabled="fileList.length === 0"
-      :loading="uploading"
-      style="margin-top: 16px"
-      @click="handleUpload"
-    >
-      {{ uploading ? 'Uploading' : 'Start Upload' }}
-    </a-button>
+          <a-button class="button-uers-tickter-color color-button-ticker" style="margin-left: 10px" @click="onSubmit" v-bind="errorInfos">
+            Gửi
+          </a-button>
         </a-form-item>
       </a-form>
     </div>
+    <MessageTicker />
   </div>
-</template>
+</template>       
 
 <script>
 import RemoverTicker from "../../components/RemoverTicker.vue";
+import MessageTicker from "@/components/MessageTicker.vue";
+// import { UploadOutlined } from '@ant-design/icons-vue';
 
 // import { message } from 'ant-design-vue';
 // import { UploadOutlined } from '@ant-design/icons-vue';
-import { reactive, toRaw, computed, defineComponent, ref } from 'vue';
+import { reactive, toRaw, computed, defineComponent } from 'vue';
 import { toArray } from 'lodash-es';
 import { Form } from 'ant-design-vue';
 
 const useForm = Form.useForm;
-// export default {
-//     components: {
-//         RemoverTicker
-//     },
-
-// }
-
-
 
 
 export default defineComponent({
   components: {
     RemoverTicker,
-    // UploadOutlined
+    MessageTicker,
+    // UploadOutlined,
   },
   setup() {
     const modelRef = reactive({
-      name: '',
-      region: undefined,
+      loaiTicket: undefined,
+      hangMuc: undefined,
+      phongBan: undefined,
+      quanTrong: undefined,
+      tenTicket: '',
+      chiTiet: '',
+      upload:'',
+      // region: undefined,
       type: [],
     });
     const rulesRef = reactive({
-      name: [
+      loaiTicket: [
         {
           required: true,
-          message: 'Please input name',
+          message: 'Vui lòng chọn loại ticker',
         },
       ],
-      region: [
+      hangMuc: [
         {
           required: true,
-          message: 'Please select region',
+          message: 'Vui lòng chọn hạng mục ticker',
         },
       ],
+      phongBan: [
+        {
+          required: true,
+          message: 'Vui lòng chọn phòng ban ticker',
+        },
+      ],
+      quanTrong: [
+        {
+          required: true,
+          message: 'Vui lòng chọn độ quan trọng ticker',
+        },
+      ],
+      tenTicket: [
+        {
+          required: true,
+          message: 'Vui lòng chọn độ quan trọng ticker',
+        },
+      ],
+      chiTiet: [
+        {
+          required: true,
+          message: 'Vui lòng chọn độ quan trọng ticker',
+        },
+      ],
+
+      // region: [
+      //   {
+      //     required: true,
+      //     message: 'Please select region',
+      //   },
+      // ],
     });
-    const { resetFields, validate, validateInfos, mergeValidateInfo } = useForm(modelRef, rulesRef);
+    const { validate, validateInfos, mergeValidateInfo } = useForm(modelRef, rulesRef);
     const onSubmit = () => {
       validate()
         .then(() => {
@@ -105,44 +162,27 @@ export default defineComponent({
         })
         .catch(err => {
           console.log('error', err);
+          computed(()=> mergeValidateInfo(toArray(validateInfos)))
         });
+        
     };
     const errorInfos = computed(() => {
       return mergeValidateInfo(toArray(validateInfos));
     });
-    const fileList = ref([]);
+    
     return {
+      rulesRef,
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       validateInfos,
-      resetFields,
+      // resetFields,
       modelRef,
       onSubmit,
       errorInfos,
-      fileList,
       headers: {
         authorization: 'authorization-text',
       },
     };
-    // const handleChange = (info: FileInfo) => {
-    //   if (info.file.status !== 'uploading') {
-    //     console.log(info.file, info.fileList);
-    //   }
-    //   if (info.file.status === 'done') {
-    //     message.success(`${info.file.name} file uploaded successfully`);
-    //   } else if (info.file.status === 'error') {
-    //     message.error(`${info.file.name} file upload failed.`);
-    //   }
-    // };
-
-    // const fileList = ref([]);
-    // return {
-    //   fileList,
-    //   headers: {
-    //     authorization: 'authorization-text',
-    //   },
-    //   handleChange,
-    // };
   },
 
 });
@@ -166,8 +206,10 @@ export default defineComponent({
 .button-uers-tickter {
   position: absolute;
   right: 0;
-  bottom: 0;
-  margin-right: 16px;
+  /* bottom: 0; */
+  padding-right: 16px;
+  padding-bottom: 30px;
+  
 }
 
 .button-uers-tickter-color {
@@ -180,5 +222,10 @@ export default defineComponent({
 .color-button-ticker {
   background-color: #0BB588;
   color: #fff;
+}
+
+
+.textarea-node {
+  height: 120px;
 }
 </style>

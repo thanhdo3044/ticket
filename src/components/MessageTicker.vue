@@ -1,6 +1,6 @@
 <template>
     <div class="message">
-        <div class="message-user">
+        <div class="message-user" @click="this.$router.push('/chatticket')" >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <g fill="none" fill-rule="evenodd" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="1.5" transform="translate(2 3.5)">
@@ -19,7 +19,7 @@
     position: fixed;
     right: 0;
     bottom: 0;
-    margin-bottom: 36px;
+    margin-bottom: 126px;
     margin-right: 20px;
 }
 

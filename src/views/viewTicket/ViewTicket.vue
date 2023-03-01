@@ -8,7 +8,7 @@
                 </a-col>
                 <a-col class="title-uers-tickter-svg">
                     <!--  -->
-                    <button @click="this.$router.push('/departmentticket')">
+                    <button @click="this.$router.push('/contentticket')">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-plus-lg"
                             viewBox="0 0 16 16">
                             <path fill-rule="evenodd"

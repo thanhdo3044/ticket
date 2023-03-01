@@ -17,15 +17,16 @@ const routes = [
   //   name: 'success',
   //   component: ()=>import('../components/SuccessTicket.vue')
   // },
-  {
-    path: '/departmentticket',
-    name: 'departmentticket',
-    component: ()=>import('../views/departmentTicket/DepartmentTicket.vue')
-  },
+
   {
     path: '/contentticket',
     name: 'contentTicket',
     component: ()=>import('../views/contentTicket/ContentTicket.vue')
+  },
+  {
+    path: '/chatticket',
+    name: 'chatTicket',
+    component: ()=>import('../views/chatTicket/ChatTichet.vue')
   }
 ]
 
