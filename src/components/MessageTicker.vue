@@ -1,6 +1,6 @@
 <template>
     <div class="message">
-        <div class="message-user" @click="this.$router.push('/chatticket')" >
+        <div class="message-user" @click="this.$router.push('/chatticket')">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <g fill="none" fill-rule="evenodd" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="1.5" transform="translate(2 3.5)">

@@ -19,9 +19,10 @@ const io = new Server(server, {
 
 io.use(( socket,next)=>{
     
-    const idName = socket.handshake.auth;
-    if(!idName) return next(new Error("invalid user idName or no fill idName"));
-    socket.idName = idName;
+    const username = socket.handshake.auth && socket.handshake.auth.username;
+
+    if(!username) return next(new Error("invalid user idName or no fill username"));
+    socket.username = username;
     next();
 })
 
@@ -31,12 +32,34 @@ io.on('connection', (socket,next) => {
     const users =[]
     for(let [id,socket] of io.of("/").sockets){
          users.push({
-            userID: id,
-            users: socket.idName,
-
+            userId: id,
+            username: socket.username,
          })
+        //  console.log(users.username);
     }
+    // console.log(users);
     socket.emit('getUsers',users);
+
+    socket.broadcast.emit("userJustConneted",{
+        userId:socket.id,
+        username:socket.username,
+    })
+
+    socket.on("privateMessage", ({message,to})=>{
+        console.log("message",to, message);
+        socket.to(to).emit("privateMessageToReceiver",{
+            message,
+            from:socket.id,
+        })
+    })
+
+    socket.on("privateMessage",({message,to})=>{
+        console.log("userID: ",to,message);
+        socket.to(to).emit("privateMessafeToReceiver",{
+            message,
+            from:socket.id, 
+        })
+    })
 
     socket.on('disconnect', () =>{
         console.log(`user disconnected`);
