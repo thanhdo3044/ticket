@@ -1,5 +1,5 @@
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,onUnmounted } from 'vue'
 import socket from "./plugins/socket.js"
 
 
@@ -10,6 +10,7 @@ export default {
     let users = ref([]);
     const selectedUserToSend = ref([])
     const message = ref("")
+    // const messages = ref([])
 
     function onSubmitLogin() {
       console.log("running");
@@ -27,9 +28,20 @@ export default {
     function onSendMessage(){
         socket.emit("privateMessage",{
           message:message.value,
-          to:this.selectedUserToSend.userId,
+          to:selectedUserToSend.value.userId,
         })
+        console.log("mess run")
+        if(!selectedUserToSend.value.messages)
+          selectedUserToSend.value.messages =[];
+          console.log("messeage 1 run",selectedUserToSend.value.messages);
+          selectedUserToSend.value?.messages.push({
+            message:message.value,
+            isSelf:true,
+          })
+          console.log("messeage 2 run",selectedUserToSend.value.messages);
         
+        console.log("messeage 3 run",selectedUserToSend.value.messages);
+        message.value = "";
         
     }
 
@@ -38,6 +50,7 @@ export default {
       socket.on("getUsers", (data) => {
         // console.log("get users", data);
         data.forEach(user => {
+        user.connected = true;
           user.self = user.userId === socket.id
         });
         users.value = data.sort((a, b) => {
@@ -50,26 +63,61 @@ export default {
       })
 
       socket.on("userJustConneted", (data) => {
+        data.connected = true;
         users.value.push(data);
         console.log("users jusr connected: ", users.value);
       })
 
       socket.on("privateMessafeToReceiver",({message,from}) => {
+        // console.log("private message receiver: ", message,from);
         for(let i=0; i<users.value.length; i++){
           const user = users.value[i];
           if(user.userId === from){
-            user.message.push({
-              message,
+            if(!user.messages) user.messages =[]
+            user.messages.push({
+              message, 
               isSelf:false,
             })
-            if(user !== selectedUserToSend.value.userId){
-              user.isHasNewMessage = true;
+            if(user !== selectedUserToSend.value?.userId) user.isHasNewMessage = true;
               break;
-            }
+            
           }
         }
       })
 
+      socket.on("connect",()=>{
+        users.value.forEach(user=>{
+          if(user.isSelf) 
+            user.connection = true;
+        })
+      })
+
+      socket.on("disconnect",()=>{
+        users.value.forEach(user=>{
+          if(user.isSelf)
+            user.connection = false;
+        })
+      })
+
+      socket.on("userDisconnect",(id)=>{
+        for(let i=0; i< users.value.length; i++){
+          const user = users.value[i]
+
+          if(user.userId ===id) {
+            user.connected = false;
+            break;
+          }
+
+        }
+      })
+
+    })
+
+    onUnmounted(()=>{
+      socket.off("getUsers")
+      socket.off("userJustConneted")
+      socket.off("privateMessafeToReceiver")
+      socket.off("userdisconnect")
     })
 
     return {
@@ -81,6 +129,7 @@ export default {
       onSelectedUserToSend,
       onSendMessage,
       message,
+      // messages,
     }
   }
 }
@@ -110,7 +159,7 @@ export default {
         <li v-for="user in users" :key="user.userId">
         <button @click="onSelectedUserToSend(user)">
           <span>{{ user.username }}</span>
-          <span> </span>
+          <span style="color: blue;">{{ user.connected ? "On": "Off" }} </span>
         </button>
       </li>
       </ul>
@@ -120,13 +169,12 @@ export default {
         Name main
         <span>{{ selectedUserToSend.username }}</span>
     </div>
-    <div>
-        main message
+    <div style="background-color: aqua;">
         <span>
             <div v-for="message in selectedUserToSend.messages" :key="JSON.stringify(message)">
               {{ message.isSelf ?"You" : selectedUserToSend.username }}
+              <h4>{{ message.message }}</h4>
             </div>
-            <h6>{{ message.message }}</h6>
         </span>
     </div>
 
