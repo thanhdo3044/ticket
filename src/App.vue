@@ -26,22 +26,22 @@ export default {
     }
 
     function onSendMessage(){
+       if(message.value != null){
         socket.emit("privateMessage",{
           message:message.value,
           to:selectedUserToSend.value.userId,
         })
-        console.log("mess run")
+        console.log("running")
         if(!selectedUserToSend.value.messages)
           selectedUserToSend.value.messages =[];
-          console.log("messeage 1 run",selectedUserToSend.value.messages);
+          // console.log("messeage 1 run",selectedUserToSend.value.messages);
           selectedUserToSend.value?.messages.push({
             message:message.value,
             isSelf:true,
           })
-          console.log("messeage 2 run",selectedUserToSend.value.messages);
         
-        console.log("messeage 3 run",selectedUserToSend.value.messages);
         message.value = "";
+       }
         
     }
 
@@ -59,13 +59,13 @@ export default {
           if (a.username < b.username) return -1;
           return a.username < b.username ? 1 : 0;
         })
-        console.log('users: ', users.value);
+        // console.log('users: ', users.value);
       })
 
       socket.on("userJustConneted", (data) => {
         data.connected = true;
         users.value.push(data);
-        console.log("users jusr connected: ", users.value);
+        // console.log("users jusr connected: ", users.value);
       })
 
       socket.on("privateMessafeToReceiver",({message,from}) => {
