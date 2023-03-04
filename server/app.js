@@ -35,7 +35,7 @@ io.on('connection', (socket,next) => {
             userId: id,
             username: socket.username,
          })
-        //  console.log(users.username);
+         console.log(users.username);
     }
     // console.log(users);
     socket.emit('getUsers',users);
@@ -46,7 +46,7 @@ io.on('connection', (socket,next) => {
     })
 
     socket.on("privateMessage", ({message,to})=>{
-        console.log("message",to, message);
+        console.log("message 12423",to, message);
         socket.to(to).emit("privateMessageToReceiver",{
             message,
             from:socket.id,
@@ -71,3 +71,5 @@ io.on('connection', (socket,next) => {
 server.listen(3111, () => {
     console.log('listening on *:3111');
 });
+
+//cors dotenv firebase-admin 
