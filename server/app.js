@@ -1,8 +1,15 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const http = require('http');
+const config = require('./config');
+const bodyParser = require('body-parser');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+
+app.use(cors());
+app.use(bodyParser.json());
+
 const io = new Server(server, {
     allowEIO3:true,    
     cors: {
@@ -59,6 +66,7 @@ io.on('connection', (socket,next) => {
             message,
             from:socket.id, 
         })
+        
     })
 
     socket.on('disconnect', () =>{
@@ -68,8 +76,11 @@ io.on('connection', (socket,next) => {
  
 });
 
-server.listen(3111, () => {
-    console.log('listening on *:3111');
-});
 
-//cors dotenv firebase-admin 
+// app.use(express.json());
+// app.use(cors());
+// app.use(bodyParser.json());
+
+server.listen(config.port, () => {
+    console.log('listening on *:3111',config.port);
+});
