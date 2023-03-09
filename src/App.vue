@@ -13,7 +13,7 @@ export default {
     // const messages = ref([])
 
     function onSubmitLogin() {
-      console.log("running");
+      console.log("running",socket);
       isLoggedIn.value = true;
       socket.auth = {
         username: username.value
