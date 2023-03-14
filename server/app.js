@@ -13,7 +13,7 @@ var admin = require('firebase-admin');
 var serviceAccount = require("./chat-thanhdo-3041521-firebase-adminsdk-hkno0-b5fa12b644.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL:'https://chat-thanhdo-3041521.firebaseio.com',
+  databaseURL:'https://thanhdochat.firebaseio.com',
 //   databaseAuthVariableOverride:null,
 });
 
@@ -67,8 +67,10 @@ io.on('connection', (socket,next) => {
             from:socket.id,
         })
         // admin.database().ref('privateMessageToReceiver'.push(message))
-        const ref = db.ref('privateMessage')
-        ref.update({
+        if(message != null){
+            const ref = db.ref('privateMessage')
+            console.log("running private message");
+        ref.push({
             message: "data",
             to:"to data",
         }).then(()=>{
@@ -76,6 +78,7 @@ io.on('connection', (socket,next) => {
         }).catch((error)=>{
             console.log("data could not be saved"+ error);
         })
+        }
     })
 
     socket.on("privateMessage",({message,to})=>{
